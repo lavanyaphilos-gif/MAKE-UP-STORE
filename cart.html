@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | Glow & Grace</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Glow & Grace</h1>
+        <nav>
+            <a href="index.html">Back to Shop</a>
+            <a href="#">Account</a>
+            <a href="#" id="cart-count">Cart (0)</a>
+        </nav>
+    </header>
+
+    <main class="cart-container">
+        <h2>Your Shopping Bag</h2>
+        
+        <div class="cart-content">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items">
+                    <tr>
+                        <td>Flawless Foundation</td>
+                        <td>$35.00</td>
+                        <td>1</td>
+                        <td>$35.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="cart-summary">
+                <h3>Order Summary</h3>
+                <p>Subtotal: <span id="subtotal">$35.00</span></p>
+                <p>Shipping: <span>FREE</span></p>
+                <hr>
+                <p><strong>Total: <span id="final-total">$35.00</span></strong></p>
+                <button class="buy-btn">Checkout Now</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Glow & Grace Beauty. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
