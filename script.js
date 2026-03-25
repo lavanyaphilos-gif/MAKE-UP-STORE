@@ -7,38 +7,32 @@ function updateCartCount() {
     }
 }
 
-// 1. Add to Cart Logic
+// 1. Add to Cart Logic (Shop Page)
 document.querySelectorAll('.buy-btn').forEach((button) => {
     button.addEventListener('click', () => {
         const card = button.closest('.product-card');
+        if (!card) return; 
+
         const name = card.querySelector('h3').innerText;
         const price = card.querySelector('p').innerText;
         const product = { name, price };
 
-        fetch('/add-to-cart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(product),
-        })
-        .then(() => {
-            cart.push(product);
-            localStorage.setItem('makeupCart', JSON.stringify(cart));
-            updateCartCount();
-            alert(`${name} added to bag!`);
-        })
-        .catch(err => console.error("Database error:", err));
+        cart.push(product);
+        localStorage.setItem('makeupCart', JSON.stringify(cart));
+        updateCartCount();
+        alert(`${name} added to your bag!`);
     });
 });
 
-// 2. Checkout Logic (For the cart.html page)
-const checkoutBtn = document.getElementById('checkout-btn') || document.querySelector('.cart-summary .buy-btn');
+// 2. Checkout Logic (Cart Page)
+const checkoutBtn = document.getElementById('checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
         if (cart.length === 0) {
             alert("Your bag is empty!");
         } else {
-            localStorage.removeItem('makeupCart');
-            window.location.href = 'success.html'; // Matches your success.html file
+            localStorage.removeItem('makeupCart'); 
+            window.location.href = 'success.html'; 
         }
     });
 }
