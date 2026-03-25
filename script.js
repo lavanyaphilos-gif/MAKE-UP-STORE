@@ -9,23 +9,48 @@ function updateCartCount() {
     }
 }
 
-// 3. Setup "Add to Cart" Buttons (on index.html)
+// 3. Setup "Add to Cart" Buttons (Sending to MongoDB + LocalStorage)
 document.querySelectorAll('.buy-btn').forEach((button) => {
     button.addEventListener('click', () => {
-        const card = button.parentElement;
+        const card = button.closest('.product-card') || button.parentElement;
         const name = card.querySelector('h3').innerText;
         const price = card.querySelector('p').innerText;
 
         const product = { name, price };
-        cart.push(product);
 
-        localStorage.setItem('makeupCart', JSON.stringify(cart));
-        updateCartCount();
-        alert(`${name} has been added to your beauty bag!`);
+        // --- CONNECT TO BACKEND ---
+        fetch('/add-to-cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product),
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Saved to MongoDB:', data);
+            
+            // Update Local UI
+            cart.push(product);
+            localStorage.setItem('makeupCart', JSON.stringify(cart));
+            updateCartCount();
+            
+            alert(`${name} has been added to your beauty bag and saved to the cloud!`);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert("Could not reach the database, but saved to your browser locally.");
+            
+            // Fallback: still update local UI even if DB fails
+            cart.push(product);
+            localStorage.setItem('makeupCart', JSON.stringify(cart));
+            updateCartCount();
+        });
     });
 });
 
-// 4. Setup the "Explore" Button (on index.html)
+// 4. Setup the "Explore" Button
 const shopBtn = document.getElementById('shop-btn');
 if (shopBtn) {
     shopBtn.addEventListener('click', function() {
@@ -38,7 +63,6 @@ const cartTableBody = document.getElementById('cart-items');
 if (cartTableBody) {
     if (cart.length === 0) {
         cartTableBody.innerHTML = "<tr><td colspan='4'>Your bag is empty.</td></tr>";
-        // Reset totals to zero if empty
         if(document.getElementById('subtotal')) document.getElementById('subtotal').innerText = "$0.00";
         if(document.getElementById('final-total')) document.getElementById('final-total').innerText = "$0.00";
     } else {
@@ -46,8 +70,7 @@ if (cartTableBody) {
         let total = 0;
 
         cart.forEach((item) => {
-            // Clean the price string (remove $) to do math
-            const priceNum = parseFloat(item.price.replace('$', ''));
+            const priceNum = parseFloat(item.price.replace(/[^0-9.-]+/g,""));
             total += priceNum;
 
             const row = `
@@ -61,7 +84,6 @@ if (cartTableBody) {
             cartTableBody.innerHTML += row;
         });
 
-        // Update the summary numbers on the cart page
         if(document.getElementById('subtotal')) {
             document.getElementById('subtotal').innerText = `$${total.toFixed(2)}`;
         }
@@ -71,20 +93,17 @@ if (cartTableBody) {
     }
 }
 
-// 6. Checkout Logic (Redirects to success.html)
+// 6. Checkout Logic
 const checkoutBtn = document.querySelector('.cart-summary .buy-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
         if (cart.length === 0) {
-            alert("Your bag is empty! Add some products before checking out.");
+            alert("Your bag is empty!");
         } else {
-            // Clear the cart from memory because order is placed
             localStorage.removeItem('makeupCart');
-            // Move to the success page
             window.location.href = 'success.html';
         }
     });
 }
 
-// Run the count update immediately when any page loads
 updateCartCount();
