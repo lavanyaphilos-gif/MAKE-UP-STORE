@@ -1,26 +1,31 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
+const path = require('path');
 const app = express();
 
-// This line tells the code to use the "Secret" link on Render, or your link if at home
+// Use the Render environment variable or your local link as a backup
 const uri = process.env.MONGODB_URI || "mongodb+srv://lavanyaphilos_db_user:323GERsrz06VasU6@cluster0.w4cgenk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const client = new MongoClient(uri);
 
-app.use(express.static('./')); 
+// Serve your HTML/CSS/JS files from the current folder
+app.use(express.static('./'));
 
 async function startServer() {
   try {
     await client.connect();
     console.log("Success! Glow and Grace is connected to the cloud!");
-    
+
+    // Render automatically sets a PORT. We must use it.
     const port = process.env.PORT || 3000;
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+    
+    // Binding to '0.0.0.0' is the key to fixing the Port timeout
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`Server is running and listening on port ${port}`);
     });
   } catch (err) {
     console.error("Connection failed:", err);
-    process.exit(1); // Tells Render something went wrong if it can't connect
+    process.exit(1);
   }
 }
 
