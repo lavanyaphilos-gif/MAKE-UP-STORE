@@ -7,33 +7,40 @@ function updateCartCount() {
     }
 }
 
-// Setup "Add to Cart" Buttons
+// 1. Add to Cart Logic
 document.querySelectorAll('.buy-btn').forEach((button) => {
     button.addEventListener('click', () => {
-        const card = button.closest('.product-card') || button.parentElement;
+        const card = button.closest('.product-card');
         const name = card.querySelector('h3').innerText;
         const price = card.querySelector('p').innerText;
         const product = { name, price };
 
-        // Talk to the server
         fetch('/add-to-cart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(product),
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
+        .then(() => {
             cart.push(product);
             localStorage.setItem('makeupCart', JSON.stringify(cart));
             updateCartCount();
-            alert(`${name} added to your beauty bag and saved to the cloud!`);
+            alert(`${name} added to bag!`);
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("Saved locally, but couldn't reach the database.");
-        });
+        .catch(err => console.error("Database error:", err));
     });
 });
+
+// 2. Checkout Logic (For the cart.html page)
+const checkoutBtn = document.getElementById('checkout-btn') || document.querySelector('.cart-summary .buy-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            alert("Your bag is empty!");
+        } else {
+            localStorage.removeItem('makeupCart');
+            window.location.href = 'success.html'; // Matches your success.html file
+        }
+    });
+}
 
 updateCartCount();
